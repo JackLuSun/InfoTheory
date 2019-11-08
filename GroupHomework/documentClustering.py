@@ -24,6 +24,8 @@ import csv
 import re
 from math import log
 
+COMMENT = True
+
 def removePunctuation(text):
     '''
         INPUT:
@@ -46,11 +48,15 @@ def loadDataSet():
                 which consists of all words from title, keyword,abstract in i-th paper
     '''
     dataSet = []
-    with open('AAAI-14 Accepted Papers.csv') as f:
+    a = 'AAAI-14 Accepted Papers.csv'
+    b = 'test.csv'
+    c= 'test2.csv'
+    with open(c,encoding='utf8') as f:
         items = csv.reader(f)
         next(items)# skip header
         wordVector = []
         for item in items:
+            #print(item[5])
             t = item[0]+" "+item[3]+" "+item[5]# title,keyword, abstract
             t = removePunctuation(t).split()
             dataSet.append(t)
@@ -82,6 +88,7 @@ def tfCount(dataSet,wv):
     '''
     tf = []
     for doc in dataSet:
+        if COMMENT: print([doc.count(word) for word in wv])
         tf.append([doc.count(word)/len(doc) for word in wv])
     
     return tf
@@ -98,7 +105,6 @@ def tf_idfCalc(tf,df):
     
     return tf_idf
         
-    
 dataSet,wordVector = loadDataSet()
 tf = tfCount(dataSet,wordVector)
 df = dfCount(dataSet,wordVector)

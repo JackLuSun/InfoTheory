@@ -1,36 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  1 15:14:15 2019
+Created on Fri Nov  8 23:08:20 2019
 
 @author: jackl
 """
 
 from math import log
 
-'''
-# static dataset
-    dataSet = [['cloudy','good','maybe'],
-               ['cloudy','sad','yes'],
-               ['cloudy','sad','maybe'],
-               ['sunny','good','no'],
-               ['sunny','good','no']]
-    attriNames = ['Weather','Mood','play or not'] # each column's name.  e.g. attributeNames[i] is i-th column's attribute name
-'''
-def loadDataSet():
-    dataSet = [['cloudy','good','maybe'],
-           ['cloudy','sad','yes'],
-           ['cloudy','sad','maybe'],
-           ['sunny','good','no'],
-           ['sunny','good','no']]
-    attriNames = ['Weather','Mood','play or not'] # each column's name.  e.g. attributeNames[i] is i-th column's attribute name
-    
-#    dataSet = []
-#    with open('motorbike.csv','r',encoding='utf8') as f:
-#        line = f.readline()
-#        attriNames = line.strip().split(',')
-#        lines = f.readlines()
-#        for line in lines:
-#            dataSet.append(line.strip().split(','))
+def loadDataSet():  
+    dataSet = []
+    with open('motorbike.csv','r',encoding='utf8') as f:
+        line = f.readline()
+        attriNames = line.strip().split(',')
+        lines = f.readlines()
+        for line in lines:
+            dataSet.append(line.strip().split(','))
             
     return dataSet,attriNames
 
@@ -38,10 +22,9 @@ def entropy(data):
     '''
     INPUT: 
         data: a vector not a matrix
-    
     OUTPUT: 
         
-        H(data): a real value which is shannon entropy
+        H(data): a real value which is the shannon entropy of data
     '''
     size = len(data)
     count = {}
@@ -104,29 +87,17 @@ def infoGainRatio(dataSet,a): # for C4.5
         information gain ratio based on the a-th attribute in dataSet
     '''
     g = infoGain(dataSet,a)
-    
     t = [item[a] for item in dataSet]
     H_a = entropy(t)
-    print(t,a,g,H_a)
+    
     if H_a !=0:# TODO
         return g/H_a
     return g
-    
-#def bestAttribute(dataSet):
-#    '''
-#    INPUT:
-#        dataSet: a matrix
-#    
-#    OUTPUT:
-#        best: id of attribute which has biggest information gain
-#    '''
-#    r = [infoGain(dataSet,a) for a in range(0,len(dataSet[0])-1)] # 指定不同的属性，返回的信息增益列表
-#    best = r.index(max(r)) # 返回信息增益最大的相应的列号
-#    
-#    return best 
 
 def bestAttribute(dataSet):
     '''
+    choose the best attribute which has biggest information gain from attributes
+    
     INPUT:
         dataSet: a matrix
     
@@ -143,10 +114,12 @@ def splitDataset(dataSet,a,v):
     INPUT:
         dataSet: a matrix
         a : column id
+        v: a specified value which belong a-th column
     split dataset by value v in a-th column
     
     OUTPUT:
-        dataset...
+        r: a subdataSet consisted of items whose value of a-th column is v,
+        eliminate the a-th column at the same time
     '''
     r = []
     for item in dataSet:
@@ -184,7 +157,8 @@ def createTree(dataSet,attriNames):
     bestCol = bestAttribute(dataSet)
     T = [item[bestCol] for item in dataSet]
     T = set(T)# set based on all bestCol-th column's value
-    bestLabel = attriNames[bestCol]
+    labelOfHighestFreq = vote([item[-1] for item in dataSet])
+    bestLabel = (attriNames[bestCol],labelOfHighestFreq)
     tree = {bestLabel:{}}
     for item in T:
         r = splitDataset(dataSet,bestCol,item)
@@ -193,24 +167,33 @@ def createTree(dataSet,attriNames):
     return tree
 
 def decision(new,tree,attriNames):
-    #print(tree)
+    '''
+        INPUT:
+            new: a new sample
+            tree: trained decision tree
+            attriNames: attributes' name for all columns 
+            
+        OUTPUT:
+            decision result
+    '''
     if type(tree) != dict:
         return tree
     # 还要考虑到不是每一个节点下面的分支包括该属性的所有可能值的，因为属性取某个值可能在训练时候一个数据样本都没有
-    key = list(tree.keys())[0]
-    col = attriNames.index(key)
+    key = list(tree.keys())[0]# key is a tuple, which consist of two element (attributes,a label which own most frequency among the sub-dataSet)
+    name = key[0]# get the attribute's name of the root node
+    col = attriNames.index(name)
     value = new[col]
+
+    if value=='': return key[1]# 处理特征缺失的情况
+    if value not in tree[key]: return key[1]
     
     return decision(new,tree[key][value],attriNames)
-    
 
 dataSet,attriNames = loadDataSet()
 
 tree = createTree(dataSet,attriNames)
-#
-new = ['sunny','good']
-#
+
+
+new = ['21…50','High','USA','']#注意，输入必须严格按特征顺序输入，如果样本该特征缺失，则填入空字符串
 r = decision(new,tree,attriNames)
-#new = ['21…50','High','USA']
-#r = decision(new,tree,attriNames)
 print(r)
