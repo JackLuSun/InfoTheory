@@ -5,22 +5,7 @@ Created on Sat Nov  2 09:47:36 2019
 @author: jackl
 """
 
-#with open('test.csv','r') as f:
-#    line = f.readline()
-#    lines = f.readlines()
-#    r = ""
-#    for line in lines:
-#        line.replace('\n',' ')
-#        r += line
-#    rr = r.split(',')
-#    for r in rr:
-#        print(r)
-#        print("")
-#        print("")
-
 import csv
-#'AAAI-14 Accepted Papers.csv'
-
 import re
 from math import log
 
@@ -32,8 +17,7 @@ def removePunctuation(text):
             text: a string
         remove punctuation in text
         
-        OUTPUT: a string
-        
+        OUTPUT: a string   
     '''
     punctuation = '!,;:?"\'.'
     text = re.sub(r'[{}]+'.format(punctuation),'',text)
@@ -44,8 +28,10 @@ def loadDataSet():
         load data from given .csv file
         OUTPUT:
             dataSet: 
-                i-th paper is represented as dataSet[i], 
-                which consists of all words from title, keyword,abstract in i-th paper
+                i-th paper is represented as dataSet[i] which consists of 
+                all words from title, keyword and abstract in i-th paper
+                
+            wordVector: a list which stores the SET of all words from all paper 's title,keyword and abstract
     '''
     dataSet = []
     a = 'AAAI-14 Accepted Papers.csv'
@@ -97,14 +83,13 @@ def tf_idfCalc(tf,df):
     '''
     OUTPUT:
         tf_idf[i][j] means importance of j-th word in i-th document
-    
     '''
     tf_idf = []
     for i in range(0,len(tf)):
         tf_idf.append([tf[i][j]*log(1/df[j]) for j in range(0,len(df))])
     
     return tf_idf
-        
+
 dataSet,wordVector = loadDataSet()
 tf = tfCount(dataSet,wordVector)
 df = dfCount(dataSet,wordVector)

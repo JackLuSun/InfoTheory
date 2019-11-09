@@ -8,13 +8,20 @@ Created on Fri Nov  8 23:08:20 2019
 from math import log
 
 def loadDataSet():  
-    dataSet = []
-    with open('motorbike.csv','r',encoding='utf8') as f:
-        line = f.readline()
-        attriNames = line.strip().split(',')
-        lines = f.readlines()
-        for line in lines:
-            dataSet.append(line.strip().split(','))
+    dataSet = [['cloudy','good','maybe'],
+           ['cloudy','sad','yes'],
+           ['cloudy','sad','maybe'],
+           ['sunny','good','no'],
+           ['sunny','good','no']]
+    attriNames = ['Weather','Mood','play or not'] # each column's name.  e.g. attributeNames[i] is i-th column's attribute name
+  
+#    dataSet = []
+#    with open('motorbike.csv','r',encoding='utf8') as f:
+#        line = f.readline()
+#        attriNames = line.strip().split(',')
+#        lines = f.readlines()
+#        for line in lines:
+#            dataSet.append(line.strip().split(','))
             
     return dataSet,attriNames
 
