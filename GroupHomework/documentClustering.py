@@ -111,21 +111,21 @@ def dist(a,b):
             b: just like a
         return averaged K-L divergence between a and b
     '''
-#    lam = 0.5# see averaged K-L divergence
-#    M = [lam*a[i]+(1-lam)*b[i] for i in range(0,len(a))]
-#    #print(M)
-#    r = 0
-#    for i in range(0,len(a)):
-#       # print(a[i],b[i],M[i])
-#        if M[i] != 0.0:
-#            if a[i] != 0:
-#                r += a[i]*log(a[i]/M[i],2)
-#            if b[i] != 0:
-#                r += b[i]*log(b[i]/M[i],2)
-    # eculidean distance
+    lam = 0.5# see averaged K-L divergence
+    M = [lam*a[i]+(1-lam)*b[i] for i in range(0,len(a))]
+    #print(M)
     r = 0
     for i in range(0,len(a)):
-        r += a[i]*b[i]
+       # print(a[i],b[i],M[i])
+        if M[i] != 0.0:
+            if a[i] != 0:
+                r += a[i]*log(a[i]/M[i],2)
+            if b[i] != 0:
+                r += b[i]*log(b[i]/M[i],2)
+#    # eculidean distance
+#    r = 0
+#    for i in range(0,len(a)):
+#        r += a[i]*b[i]
     
 
     return sqrt(r)
