@@ -89,21 +89,6 @@ def tf_idfCalc(tf,df):
     
     return tf_idf
 
-def divergence(a,b):
-    '''
-        INPUT: 
-            a: a vector
-            b: a vector having same dimension with b
-        OUTPUT:
-            KL Divergence between a and b
-    '''
-    r = 0
-    for i in range(0,len(a)):
-        if b[i] != 0:
-            r += a[i]*log(a[i]/b[i],2)
-    
-    return r
-
 def dist(a,b):
     '''
         INPUT:
@@ -113,10 +98,8 @@ def dist(a,b):
     '''
     lam = 0.5# see averaged K-L divergence
     M = [lam*a[i]+(1-lam)*b[i] for i in range(0,len(a))]
-    #print(M)
     r = 0
     for i in range(0,len(a)):
-       # print(a[i],b[i],M[i])
         if M[i] != 0.0:
             if a[i] != 0:
                 r += a[i]*log(a[i]/M[i],2)
