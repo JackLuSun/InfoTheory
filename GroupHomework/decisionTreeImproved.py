@@ -6,22 +6,23 @@ Created on Fri Nov  8 23:08:20 2019
 """
 
 from math import log
+import graphviz
 
 def loadDataSet():  
-    dataSet = [['cloudy','good','maybe'],
-           ['cloudy','sad','yes'],
-           ['cloudy','sad','maybe'],
-           ['sunny','good','no'],
-           ['sunny','good','no']]
-    attriNames = ['Weather','Mood','play or not'] # each column's name.  e.g. attributeNames[i] is i-th column's attribute name
-  
-#    dataSet = []
-#    with open('motorbike.csv','r',encoding='utf8') as f:
-#        line = f.readline()
-#        attriNames = line.strip().split(',')
-#        lines = f.readlines()
-#        for line in lines:
-#            dataSet.append(line.strip().split(','))
+#    dataSet = [['cloudy','good','maybe'],
+#           ['cloudy','sad','yes'],
+#           ['cloudy','sad','maybe'],
+#           ['sunny','good','no'],
+#           ['sunny','good','no']]
+#    attriNames = ['Weather','Mood','play or not'] # each column's name.  e.g. attributeNames[i] is i-th column's attribute name
+#  
+    dataSet = []
+    with open('motorbike.csv','r',encoding='utf8') as f:
+        line = f.readline()
+        attriNames = line.strip().split(',')
+        lines = f.readlines()
+        for line in lines:
+            dataSet.append(line.strip().split(','))
             
     return dataSet,attriNames
 
@@ -196,6 +197,41 @@ def decision(new,tree,attriNames):
     
     return decision(new,tree[key][value],attriNames)
 
+
+# 起名字是个麻烦事儿，一不小心就重名； 干脆直接按数字编号，但，又需要表达逻辑关系
+nameID = 0
+def visualize(tree,dot):# depth 表示当前决策树深度，引入depth 是为了 dot.node 中区分相同节点名 ，统一将标签名更改为 “层数+节点名” 
+    '''
+       INPUT:
+        tree: a dict which represent a decision tree
+        dot: dot = graphviz.Digraph(comment='here write a dot name')
+        nameID : a global variable for solving "name things" which need to keep relation of logic and 'name' must distinct at the same time.
+        
+        借助 graphviz 来绘制决策树
+    
+        OUTPUT:
+            root: just for coding writing.
+    '''
+    key = list(tree.keys())[0]
+    root = str(key) # root's name
+    global nameID
+    root = root+str(nameID)
+    dot.node(root,str(key))
+    nameID += 1
+    t = tree[key]
+    
+    for k in t:# k 是相应的“边” ，对边进行遍历
+        if type(t[k]) != dict:# 碰到了叶子
+            dot.node(t[k]+str(nameID),t[k])
+            dot.edge(root,t[k]+str(nameID),label=k)
+            nameID += 1
+        else:
+            subRoot = visualize(t[k],dot)
+            dot.edge(root,subRoot,label=k)
+            
+    return root
+
+
 dataSet,attriNames = loadDataSet()
 
 tree = createTree(dataSet,attriNames)
@@ -203,4 +239,12 @@ tree = createTree(dataSet,attriNames)
 
 new = ['21…50','High','USA','']#注意，输入必须严格按特征顺序输入，如果样本该特征缺失，则填入空字符串
 r = decision(new,tree,attriNames)
-print(r)
+    
+            
+dot = graphviz.Digraph(comment='my dot')
+
+#tree = {'A':{'B':'C','D':{'E':{'F':'G'}}}}
+visualize(tree,dot)# show the tree
+
+dot.render('decisionTree',view=True)
+

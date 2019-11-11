@@ -7,7 +7,7 @@ Created on Sat Nov  2 09:47:36 2019
 
 import csv
 import re
-from math import log
+from math import log,sqrt
 
 COMMENT = True
 
@@ -85,7 +85,7 @@ def tf_idfCalc(tf,df):
     '''
     tf_idf = []
     for i in range(0,len(tf)):
-        tf_idf.append([tf[i][j]*log(1/df[j]) for j in range(0,len(df))])
+        tf_idf.append([tf[i][j]*log(1/df[j],2) for j in range(0,len(df))])
     
     return tf_idf
 
@@ -99,7 +99,8 @@ def divergence(a,b):
     '''
     r = 0
     for i in range(0,len(a)):
-        r += a[i]*log((a[i]+1)/(b[i]+1))/log(2)
+        if b[i] != 0:
+            r += a[i]*log(a[i]/b[i],2)
     
     return r
 
@@ -110,12 +111,24 @@ def dist(a,b):
             b: just like a
         return averaged K-L divergence between a and b
     '''
-    lam = 0.5# see averaged K-L divergence
-    M = [lam*a[i]+(1-lam)*b[i] for i in range(0,len(a))]
+#    lam = 0.5# see averaged K-L divergence
+#    M = [lam*a[i]+(1-lam)*b[i] for i in range(0,len(a))]
+#    #print(M)
+#    r = 0
+#    for i in range(0,len(a)):
+#       # print(a[i],b[i],M[i])
+#        if M[i] != 0.0:
+#            if a[i] != 0:
+#                r += a[i]*log(a[i]/M[i],2)
+#            if b[i] != 0:
+#                r += b[i]*log(b[i]/M[i],2)
+    # eculidean distance
+    r = 0
+    for i in range(0,len(a)):
+        r += a[i]*b[i]
     
-    r = lam*divergence(a,M) + (1-lam)*divergence(b,M)    
-    
-    return r
+
+    return sqrt(r)
 
 def kmean(dataSet, k = 5):
     '''
@@ -152,8 +165,6 @@ def kmean(dataSet, k = 5):
         u = uu# 更新中心，继续训练
         
     return None
-    
-    
 
 dataSet,wordVector = loadDataSet()
 tf = tfCount(dataSet,wordVector)
@@ -163,3 +174,21 @@ tf_idf = tf_idfCalc(tf,df)
 
 r = kmean(tf_idf,5)
 print(r)
+
+a = 'AAAI-14 Accepted Papers.csv'
+
+titles = []
+with open(a) as f:
+    items = csv.reader(f)
+    next(items)# skip header
+    wordVector = []
+    for item in items:
+        titles.append(item[0])
+        
+with open("result.csv","w") as f:
+    for i in range(0,len(titles)):
+        f.write(str(r[i])+';'+titles[i]+'\n')
+        
+        
+        
+

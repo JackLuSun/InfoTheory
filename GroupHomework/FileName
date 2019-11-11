@@ -1,0 +1,11 @@
+// The Round Table
+digraph {
+	no [label=no]
+	Mood -> no [label=good]
+	Weather -> "('Mood', 'no')" [label=sunny]
+	yes [label=yes]
+	Mood -> yes [label=sad]
+	maybe [label=maybe]
+	Mood -> maybe [label=good]
+	Weather -> "('Mood', 'maybe')" [label=cloudy]
+}
